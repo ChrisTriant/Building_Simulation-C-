@@ -64,8 +64,9 @@ public:
 
 class Entrance{
 	protected:
-	 int max_cap;
+	 const int max_cap;
 	public:
+		Entrance(int mcap);
 		virtual ~Entrance();
 		virtual void enter();
 		virtual void enter(visitor** varray,int& voutside,int&gfcounter,bool grfull,int &bcounter);
@@ -97,7 +98,7 @@ class Level{
 
 class wlobby: public Entrance {
 private:
-	const int fl_num,Nf;
+	const int fl_num;
 	Queue** wait_array;
 public:
 	wlobby(const int fl,const int nf) ;
@@ -110,7 +111,6 @@ public:
 /*############################################*/
 class groundlobby: public Entrance{
 	private:
-		const int Ng;
 		int priority;
 		Queue* gf_queue;
 	public:

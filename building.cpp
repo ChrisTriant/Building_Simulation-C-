@@ -168,6 +168,8 @@ visitor* Level::exit(int f){
 /*########################################*/
 
 /*###############ENTRANCE#################*/
+Entrance::Entrance(int mcap):max_cap(mcap){
+}
 Entrance::~Entrance(){
 	
 }
@@ -184,10 +186,10 @@ visitor* Entrance::exit(int f){
 	
 /*###############WAITINGLOBBY###################*/
 	
-	wlobby::wlobby(const int fl,const int nf) :fl_num(fl),Nf(nf) {
+	wlobby::wlobby(const int fl,const int nf) :fl_num(fl),Entrance(nf) {
 		wait_array=new Queue*[11];
 		for(int i=0;i<11;i++){
-			wait_array[i]=new Queue(Nf);
+			wait_array[i]=new Queue(max_cap);
 		}
 		cout<<"waiting lobby on floor " <<fl_num<<" has been created"<<endl<<endl;	
 	}
@@ -219,10 +221,10 @@ visitor* Entrance::exit(int f){
 
 /*###############GROUNDLOBBY###################*/
 
-	groundlobby::groundlobby(const int ng):Ng(ng){
+	groundlobby::groundlobby(const int ng):Entrance(ng){
 		cout<<"waiting lobby on ground floor has been created"<<endl;
-		cout<<"A queue in the ground floor has been created with length "<<Ng<<endl;
-		gf_queue=new Queue(Ng);
+		cout<<"A queue in the ground floor has been created with length "<<max_cap<<endl;
+		gf_queue=new Queue(max_cap);
 		priority=1;
 	}
 	
