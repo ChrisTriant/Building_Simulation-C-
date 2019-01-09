@@ -26,7 +26,7 @@ int main(int argc,char* argv[]){
 	}
 	cout<<"Office capacity is: "<<No<<endl;
 	const int Nl=atoi(argv[5]);
-	if(Nl <= No||Nl>Ng){
+	if(Nl < No||Nl>Ng){
 		cout<<"Invalid capacities.Please try again";
 		return -1;	
 	}

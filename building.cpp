@@ -100,10 +100,22 @@ void Queue::Push(visitor* v)
 	
 /*########################################*/
 
+/*###############SPACE###################*/
+
+Space::Space(int cap):capacity(cap){
+}
+
+Space::~Space(){
+}
+
+
+/*########################################*/
+
+
 /*###############OFFICE###################*/
 
-	office::office(const int fl, const int of,const int no) :fl_num(fl), of_num(of),No(no){
-		customers=new Queue(No);
+	office::office(const int fl, const int of,const int no) :fl_num(fl), of_num(of),Space(no){
+		customers=new Queue(capacity);
 		ocounter=0;
 		cout << "Office number " << fl_num << "-" << of_num << " has been created" << endl;
 	}
@@ -122,7 +134,7 @@ void Queue::Push(visitor* v)
 	}
 	
 	bool office::isFull(){
-		return ocounter==No;
+		return ocounter==capacity;
 	}
 	int office::getocounter(){			//returns office counter
 		return ocounter;
@@ -132,7 +144,7 @@ void Queue::Push(visitor* v)
 
 /*#################LEVEL##################*/
 
-Level::Level(int cap):capacity(cap){
+Level::Level(int cap):Space(cap){
 	
 }
 
@@ -149,7 +161,7 @@ bool Level::isLvLFull(){
 }
 
 void Level::enter(visitor* v){
-	entr->enter();
+	entr->enter(v);
 }
 
 visitor* Level::exit(){
@@ -173,7 +185,7 @@ Entrance::Entrance(int mcap):max_cap(mcap){
 Entrance::~Entrance(){
 	
 }
-void Entrance::enter(){
+void Entrance::enter(visitor* v){
 }
 void Entrance::enter(visitor** varray,int& voutside,int&gfcounter,bool grfull,int &bcounter){
 }
@@ -183,6 +195,11 @@ visitor* Entrance::exit(){
 
 visitor* Entrance::exit(int f){
 }
+
+bool Entrance::is_arr_empty(int f){
+}
+	
+/*########################################*/	
 	
 /*###############WAITINGLOBBY###################*/
 	
@@ -271,7 +288,7 @@ visitor* Entrance::exit(int f){
 		for(int i=0;i<10;i++){
 			ofarray[i]=new office(fl_num,i+1,No);
 		}
-		wlb= new wlobby(fl_num,capacity);
+		entr= new wlobby(fl_num,capacity);
 	}
 
 	floor::~floor() {
@@ -279,15 +296,15 @@ visitor* Entrance::exit(int f){
 			delete(ofarray[i]);
 		}
 		delete[] ofarray;
-		delete wlb;
+		delete entr;
 		cout<<"Floor number: "<<fl_num<<" has been destroyed"<<endl<<endl;
 	}
 
 	
 	void floor::floor_operate(int rem){									//visitors enter the offices,they get served randomly and then they return to the waiting lobby
 		for(int i=0;i<10;i++){
-			while(!ofarray[i]->isFull()&&!wlb->is_arr_empty(i+1)){
-				office_enter(wlb->exit(i+1),i);
+			while(!ofarray[i]->isFull()&&!entr->is_arr_empty(i+1)){
+				office_enter(entr->exit(i+1),i);
 			}
 
 			if(ofarray[i]->isFull()){
@@ -303,20 +320,20 @@ visitor* Entrance::exit(int f){
 				for(int j=0;j<r;j++){
 					served=ofarray[i]->exit();
 					served->gotserved();
-					wlb->enter(served);
+					entr->enter(served);
 				}
 			}else{
 				for(int j=0;j<ofarray[i]->getocounter();j++){
 					served=ofarray[i]->exit();
 					served->gotserved();
-					wlb->enter(served);
+					entr->enter(served);
 				}
 			}
 		}
 	}
 	
 	void floor::enter(visitor* v){			//a visitor enters a floor
-		wlb->enter(v);
+		entr->enter(v);
 		vcounter++;
 	}
 	
@@ -326,12 +343,12 @@ visitor* Entrance::exit(int f){
 	
 	visitor* floor::exit(int f){				//a visitor leaves the floor
 		vcounter--;
-		return wlb->exit(f);
+		return entr->exit(f);
 	}
 	
 
 	bool floor::get_warray_isempty(int f){   //see if a waiting queue is empty
-		return wlb->is_arr_empty(f);
+		return entr->is_arr_empty(f);
 	}
 	
 /*######################################*/
@@ -340,23 +357,23 @@ visitor* Entrance::exit(int f){
 
 	Groundfloor::Groundfloor(int ng):Level(ng){			
 		vcounter=0;
-		gfwlb=new groundlobby(capacity);
+		entr=new groundlobby(capacity);
 		cout<<"Ground floor has been created"<<endl; 
 	}
 	
 	Groundfloor::~Groundfloor(){					
-		delete gfwlb;
+		delete entr;
 		cout<<"Ground floor has been destroyed"<<endl<<endl;
 	}
 
 	
 	void Groundfloor::enter(visitor **varray,int& voutside,int &bcounter){						//sends visitor int the ground floor waiting lobby
-			gfwlb->enter(varray,voutside,vcounter,isLvLFull(),bcounter); 
+			entr->enter(varray,voutside,vcounter,isLvLFull(),bcounter); 
 	}
 	
 	visitor* Groundfloor::exit(){					//gets a visitor from the ground floor waiting lobby
 		vcounter--;						
-		return gfwlb->exit();
+		return entr->exit();
 	}
 	void Groundfloor::exit(visitor* v){					//a visitor has been served
 		cout<<"I finally finished!!! .Order number: "<<v->getpriority()<<endl;
@@ -365,12 +382,12 @@ visitor* Entrance::exit(int f){
 
 /*###############ELEVATOR###################*/
 
-	Elevator::Elevator(int Nel):Nl(Nel){
+	Elevator::Elevator(int Nel):Space(Nel){
 		cout<<"A lift has been created"<<endl<<endl;
 		elcounter=0;
 		stoparray=new Queue*[5];
 		for(int i=0;i<5;i++){
-			stoparray[i]=new Queue(Nl);
+			stoparray[i]=new Queue(capacity);
 		}
 	}
 	Elevator::~Elevator(){
@@ -381,7 +398,7 @@ visitor* Entrance::exit(int f){
 		delete[] stoparray;
 	}
 	bool Elevator::checkelfull(){
-		return elcounter==Nl;
+		return elcounter==capacity;
 	}
 	
 	int Elevator::getelcounter(){
@@ -420,7 +437,7 @@ visitor* Entrance::exit(int f){
 		stop_up(flarray);
 		cout<<endl;
 		for(int i=0;i<4;i++){
-			flarray[i]->floor_operate(Nl-elcounter);
+			flarray[i]->floor_operate(capacity-elcounter);
 		}
 		stop_down(flarray);
 		int c=0;
@@ -433,9 +450,9 @@ visitor* Entrance::exit(int f){
 /*###########################################*/
 /*###############BUILDING###################*/
 
-	Building::Building(const int n,const int ng,const int nl,const int nf,const int no):N(n),Ng(ng),Nl(nl),Nf(nf),No(no){
+	Building::Building(const int n,const int ng,const int nl,const int nf,const int no):Space(n),Ng(ng),Nl(nl),Nf(nf),No(no){
 		groundfloor=new Groundfloor(Ng);
-		elevator=new Elevator(N);
+		elevator=new Elevator(Nl);
 		flarray=new floor*[4];
 		for(int i=0;i<4;i++){
 			flarray[i]=new floor(i+1,Nf,No);
@@ -453,12 +470,15 @@ visitor* Entrance::exit(int f){
 		cout<<"Service not available any longer.Go elsewhere!"<<endl;
 	}
 	bool Building::isFull(){
-		return bcounter==N;
+		return bcounter==capacity;
 	}
 	int Building::enter(visitor** varray,int voutside,int &bcounter){		//a visitor enters the building and is guided to the ground floor waiting lobby
 		groundfloor->enter(varray,voutside,bcounter);
 		return voutside;
 	}
+	void Building::enter(visitor* v){
+	}
+	
 	void Building::el_enter(){										//visitors enter the elevator
 		while(!elevator->checkelfull()&&getgfcounter()){
 			elevator->enter( groundfloor->exit());

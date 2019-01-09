@@ -40,11 +40,25 @@ public:
 
 /*########################################*/
 
+/*###############SPACE###################*/
+
+class Space{
+protected: 
+	const int capacity;
+public:
+	Space(int cap);	
+	~Space();
+	virtual void enter(visitor* v)=0;
+};
+
+
+
+/*########################################*/
+
 /*###############OFFICE###################*/
 
-class office {
+class office:public Space {
 private:
-	const int No;
 	const int fl_num;
 	const int of_num;
 	int ocounter;
@@ -68,15 +82,15 @@ class Entrance{
 	public:
 		Entrance(int mcap);
 		virtual ~Entrance();
-		virtual void enter();
+		virtual void enter(visitor* v);
 		virtual void enter(visitor** varray,int& voutside,int&gfcounter,bool grfull,int &bcounter);
 		virtual visitor* exit();
 		virtual visitor* exit(int f);
+		virtual	bool is_arr_empty(int f);
 };
 
-class Level{
+class Level:public Space{
 	protected:
-		const int capacity;
 		int vcounter;
 		Entrance* entr;
 	public:
@@ -110,7 +124,7 @@ public:
 
 /*############################################*/
 class groundlobby: public Entrance{
-	private:
+	private: 
 		int priority;
 		Queue* gf_queue;
 	public:
@@ -125,7 +139,6 @@ class groundlobby: public Entrance{
 class Groundfloor:public Level{
 	private:
 		int priority;
-		groundlobby* gfwlb;
 		visitor* served;
 	public:
 		Groundfloor(const int ng);
@@ -144,7 +157,6 @@ private:
 	const int No;
 	const int fl_num;
 	office** ofarray;
-	wlobby* wlb;
 public:
 	floor(const int fl,const int Nf,const int No);
 	~floor();
@@ -159,9 +171,8 @@ public:
 
 /*###############ELEVATOR###################*/
 
-class Elevator{
+class Elevator:public Space{
 	private:
-		int Nl;
 		int elcounter;
 		Queue** stoparray;
 	public:
@@ -180,9 +191,8 @@ class Elevator{
 
 /*###############BUILDING###################*/
 
-class Building{
+class Building:public Space{
 	private:
-		const int N;
 		const int Ng;
 		const int Nl;
 		const int Nf;
@@ -196,6 +206,7 @@ class Building{
 		Building(const int n,const int ng,const int nl,const int nf,const int no);
 		~Building();
 		int enter(visitor **varray,int voutside,int &bcounter);
+		void enter(visitor* v);
 		bool isFull();
 		int getgfcounter();
 		int getelcounter();
