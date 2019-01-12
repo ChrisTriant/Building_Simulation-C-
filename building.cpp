@@ -103,6 +103,7 @@ void Queue::Push(visitor* v)
 /*###############SPACE###################*/
 
 Space::Space(int cap):capacity(cap){
+	vcounter=0;
 }
 
 Space::~Space(){
@@ -116,7 +117,6 @@ Space::~Space(){
 
 	office::office(const int fl, const int of,const int no) :fl_num(fl), of_num(of),Space(no){
 		customers=new Queue(capacity);
-		ocounter=0;
 		cout << "Office number " << fl_num << "-" << of_num << " has been created" << endl;
 	}
 	office::~office() {
@@ -126,18 +126,18 @@ Space::~Space(){
 	void office::enter(visitor* v){								//a visitor enters an office and the office counter increases
 		customers->Push(v);
 		cout<<"visitor with destination "<<v->getfloor()<<"-"<<v->getoffice()<<" has entered office number: "<<fl_num<<"-"<<of_num<<endl;
-		ocounter++;
+		vcounter++;
 	}
 	visitor* office::exit(){					//a visitor leaves an office and the office counter decreases
-		ocounter--;
+		vcounter--;
 		return	customers->Pop();	
 	}
 	
 	bool office::isFull(){
-		return ocounter==capacity;
+		return vcounter==capacity;
 	}
 	int office::getocounter(){			//returns office counter
-		return ocounter;
+		return vcounter;
 	}
 	
 /*########################################*/
@@ -315,6 +315,9 @@ bool Entrance::is_arr_empty(int f){
 		visitor* served;
 		for(int i=0;i<10;i++){
 			int r=rand()%(rem/10);
+			if(r==0){
+				r=1;
+			}
 			if(r<ofarray[i]->getocounter()){
 
 				for(int j=0;j<r;j++){
@@ -384,7 +387,7 @@ bool Entrance::is_arr_empty(int f){
 
 	Elevator::Elevator(int Nel):Space(Nel){
 		cout<<"A lift has been created"<<endl<<endl;
-		elcounter=0;
+		vcounter=0;
 		stoparray=new Queue*[5];
 		for(int i=0;i<5;i++){
 			stoparray[i]=new Queue(capacity);
@@ -398,11 +401,11 @@ bool Entrance::is_arr_empty(int f){
 		delete[] stoparray;
 	}
 	bool Elevator::checkelfull(){
-		return elcounter==capacity;
+		return vcounter==capacity;
 	}
 	
 	int Elevator::getelcounter(){
-		return elcounter;
+		return vcounter;
 	}
 	
 	void Elevator::enter(visitor* v){			//a visitor enters the elevator
@@ -414,9 +417,10 @@ bool Entrance::is_arr_empty(int f){
 			stoparray[0]->Push(v);
 			cout<<"A served customer has entered the elevator"<<endl<<endl;
 		}
+		vcounter++;
 	}
 	visitor* Elevator::el_exit(int stop){			//a visitor exits the elavator
-		elcounter--;
+		vcounter--;
 		return stoparray[stop]->Pop();
 	}
 	void Elevator::stop_up(floor** flarray){		//the elevator goes up,leaving visitor at each floor
@@ -437,12 +441,12 @@ bool Entrance::is_arr_empty(int f){
 		stop_up(flarray);
 		cout<<endl;
 		for(int i=0;i<4;i++){
-			flarray[i]->floor_operate(capacity-elcounter);
+			flarray[i]->floor_operate(capacity-vcounter);
 		}
 		stop_down(flarray);
 		int c=0;
 		while(!stoparray[0]->IsEmpty()){
-			groundfloor->exit(stoparray[0]->Pop());
+			groundfloor->exit(el_exit(0));
 			c++;
 		}
 		return c;					//number of served visitors
@@ -458,7 +462,7 @@ bool Entrance::is_arr_empty(int f){
 			flarray[i]=new floor(i+1,Nf,No);
 		}
 		cout<<"A new building is ready for serving citizens!"<<endl;
-		bcounter=0;
+		vcounter=0;
 	}
 	Building::~Building(){
 		for(int i=0;i<4;i++){
@@ -470,10 +474,10 @@ bool Entrance::is_arr_empty(int f){
 		cout<<"Service not available any longer.Go elsewhere!"<<endl;
 	}
 	bool Building::isFull(){
-		return bcounter==capacity;
+		return vcounter==capacity;
 	}
-	int Building::enter(visitor** varray,int voutside,int &bcounter){		//a visitor enters the building and is guided to the ground floor waiting lobby
-		groundfloor->enter(varray,voutside,bcounter);
+	int Building::enter(visitor** varray,int voutside,int &vcounter){		//a visitor enters the building and is guided to the ground floor waiting lobby
+		groundfloor->enter(varray,voutside,vcounter);
 		return voutside;
 	}
 	void Building::enter(visitor* v){
@@ -498,10 +502,10 @@ bool Entrance::is_arr_empty(int f){
 		if(voutside&&!isFull()){				//if there are visitor outside they enter the building
 			x=voutside;
 			cout<<x<<" visitors are outside"<<endl;
-			voutside=enter(tempvarray,voutside,bcounter);
+			voutside=enter(tempvarray,voutside,vcounter);
 			cout<<x-voutside<<" visitors have entered  the building"<<endl;
 			cout<<voutside<<"  visitors are waiting outside"<<endl;
-			cout<<"There are "<<bcounter<<" in the building"<<endl<<endl;
+			cout<<"There are "<<vcounter<<" in the building"<<endl<<endl;
 			if(x!=voutside){
 			tempvarray=tempvarray+x-voutside;
 			}
@@ -511,7 +515,7 @@ bool Entrance::is_arr_empty(int f){
 				el_enter();						//call to get visitors into the elevator
 		cout<<endl<<endl;
 			int t=elevator->operate(flarray,groundfloor);		
-			bcounter=bcounter-t;				//served visitors leave the building and the building counter is decreased
+			vcounter=vcounter-t;				//served visitors leave the building and the building counter is decreased
 		}
 
 	}

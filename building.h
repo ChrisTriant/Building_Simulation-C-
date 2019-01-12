@@ -45,6 +45,7 @@ public:
 class Space{
 protected: 
 	const int capacity;
+	int vcounter;
 public:
 	Space(int cap);	
 	~Space();
@@ -61,7 +62,6 @@ class office:public Space {
 private:
 	const int fl_num;
 	const int of_num;
-	int ocounter;
 	Queue* customers;
 public:
 	office(const int fl, const int of,const int no);
@@ -91,7 +91,6 @@ class Entrance{
 
 class Level:public Space{
 	protected:
-		int vcounter;
 		Entrance* entr;
 	public:
 		Level(int cap);
@@ -173,7 +172,6 @@ public:
 
 class Elevator:public Space{
 	private:
-		int elcounter;
 		Queue** stoparray;
 	public:
 		Elevator(int Nel);
@@ -198,7 +196,6 @@ class Building:public Space{
 		const int Nf;
 		const int No;
 		int voutside;
-		int bcounter;
 		floor** flarray;
 		Groundfloor* groundfloor;
 		Elevator* elevator;
