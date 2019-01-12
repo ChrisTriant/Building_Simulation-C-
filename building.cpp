@@ -109,6 +109,13 @@ Space::Space(int cap):capacity(cap){
 Space::~Space(){
 }
 
+int Space::getcounter(){
+	return vcounter;
+}
+
+bool Space::isFull(){
+	return vcounter==capacity;
+}
 
 /*########################################*/
 
@@ -133,9 +140,7 @@ Space::~Space(){
 		return	customers->Pop();	
 	}
 	
-	bool office::isFull(){
-		return vcounter==capacity;
-	}
+
 	int office::getocounter(){			//returns office counter
 		return vcounter;
 	}
@@ -150,14 +155,6 @@ Level::Level(int cap):Space(cap){
 
 Level::~Level(){
 	
-}
-
-int Level::getcounter(){
-	return vcounter;
-}
-
-bool Level::isLvLFull(){
-	return vcounter==capacity;
 }
 
 void Level::enter(visitor* v){
@@ -371,7 +368,7 @@ bool Entrance::is_arr_empty(int f){
 
 	
 	void Groundfloor::enter(visitor **varray,int& voutside,int &bcounter){						//sends visitor int the ground floor waiting lobby
-			entr->enter(varray,voutside,vcounter,isLvLFull(),bcounter); 
+			entr->enter(varray,voutside,vcounter,isFull(),bcounter); 
 	}
 	
 	visitor* Groundfloor::exit(){					//gets a visitor from the ground floor waiting lobby
@@ -400,13 +397,7 @@ bool Entrance::is_arr_empty(int f){
 		}
 		delete[] stoparray;
 	}
-	bool Elevator::checkelfull(){
-		return vcounter==capacity;
-	}
 	
-	int Elevator::getelcounter(){
-		return vcounter;
-	}
 	
 	void Elevator::enter(visitor* v){			//a visitor enters the elevator
 		if(!v->getisServed()){					//if he is not served he enters a queue for the floor he wants to go to
@@ -425,7 +416,7 @@ bool Entrance::is_arr_empty(int f){
 	}
 	void Elevator::stop_up(floor** flarray){		//the elevator goes up,leaving visitor at each floor
 		for(int i=0;i<4;i++){
-			while(!flarray[i]->isLvLFull()&&!stoparray[i+1]->IsEmpty()){
+			while(!flarray[i]->isFull()&&!stoparray[i+1]->IsEmpty()){
 				flarray[i]->enter(el_exit(i+1));
 			}
 		}
@@ -473,9 +464,7 @@ bool Entrance::is_arr_empty(int f){
 		delete groundfloor;
 		cout<<"Service not available any longer.Go elsewhere!"<<endl;
 	}
-	bool Building::isFull(){
-		return vcounter==capacity;
-	}
+	
 	int Building::enter(visitor** varray,int voutside,int &vcounter){		//a visitor enters the building and is guided to the ground floor waiting lobby
 		groundfloor->enter(varray,voutside,vcounter);
 		return voutside;
@@ -484,7 +473,7 @@ bool Entrance::is_arr_empty(int f){
 	}
 	
 	void Building::el_enter(){										//visitors enter the elevator
-		while(!elevator->checkelfull()&&getgfcounter()){
+		while(!elevator->isFull()&&getgfcounter()){
 			elevator->enter( groundfloor->exit());
 		}	
 	}
@@ -492,7 +481,7 @@ bool Entrance::is_arr_empty(int f){
 		return groundfloor->getcounter();
 	}
 	int Building::getelcounter(){
-		return elevator->getelcounter();
+		return elevator->getcounter();
 	}
 	void Building::operate(int K,int L,visitor** varray){
 	int voutside=K;

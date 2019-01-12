@@ -50,6 +50,8 @@ public:
 	Space(int cap);	
 	~Space();
 	virtual void enter(visitor* v)=0;
+	virtual int getcounter();
+	virtual bool isFull();
 };
 
 
@@ -68,7 +70,6 @@ public:
 	~office() ;
 	void enter(visitor* v);
 	visitor* exit();
-	bool isFull();
 	int getocounter();
 };
 
@@ -95,8 +96,6 @@ class Level:public Space{
 	public:
 		Level(int cap);
 		virtual ~Level();
-		virtual int getcounter();
-		virtual bool isLvLFull();
 		virtual void enter(visitor* v);
 		virtual void enter(visitor** varray,int& voutside,int &bcounter);
 		virtual visitor* exit();
@@ -176,8 +175,6 @@ class Elevator:public Space{
 	public:
 		Elevator(int Nel);
 		~Elevator();
-		int getelcounter();
-		bool checkelfull();
 		void enter(visitor* v);
 		visitor* el_exit(int stop);
 		void stop_up(floor** flarray);
@@ -204,7 +201,6 @@ class Building:public Space{
 		~Building();
 		int enter(visitor **varray,int voutside,int &bcounter);
 		void enter(visitor* v);
-		bool isFull();
 		int getgfcounter();
 		int getelcounter();
 		void exit();
