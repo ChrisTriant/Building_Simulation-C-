@@ -410,14 +410,14 @@ bool Entrance::is_arr_empty(int f){
 		}
 		vcounter++;
 	}
-	visitor* Elevator::el_exit(int stop){			//a visitor exits the elavator
+	visitor* Elevator::exit(int stop){			//a visitor exits the elavator
 		vcounter--;
 		return stoparray[stop]->Pop();
 	}
 	void Elevator::stop_up(floor** flarray){		//the elevator goes up,leaving visitor at each floor
 		for(int i=0;i<4;i++){
 			while(!flarray[i]->isFull()&&!stoparray[i+1]->IsEmpty()){
-				flarray[i]->enter(el_exit(i+1));
+				flarray[i]->enter(exit(i+1));
 			}
 		}
 	}
@@ -437,7 +437,7 @@ bool Entrance::is_arr_empty(int f){
 		stop_down(flarray);
 		int c=0;
 		while(!stoparray[0]->IsEmpty()){
-			groundfloor->exit(el_exit(0));
+			groundfloor->exit(exit(0));
 			c++;
 		}
 		return c;					//number of served visitors

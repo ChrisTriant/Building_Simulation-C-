@@ -176,7 +176,7 @@ class Elevator:public Space{
 		Elevator(int Nel);
 		~Elevator();
 		void enter(visitor* v);
-		visitor* el_exit(int stop);
+		visitor* exit(int stop);
 		void stop_up(floor** flarray);
 		void stop_down(floor** flarray);
 		int operate(floor** flarray,Groundfloor* groundfloor);
